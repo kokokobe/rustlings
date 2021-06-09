@@ -37,6 +37,28 @@ impl Default for Person {
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.len() == 0 {
+            return Person::default();
+        }
+        let split_vec: Vec<&str> = s.split(",").collect();
+        if split_vec.len() > 2 || split_vec.len() < 2 {
+            return Person::default();
+        }
+        println!("vec is:{:?}", split_vec);
+        if split_vec[0].len() < 2 {
+            return Person::default();
+        };
+        if split_vec[1].len() == 0 {
+            return Person::default();
+        }
+        let parse_result = split_vec[1].parse::<usize>();
+        if let Err(x) = parse_result {
+            return Person::default();
+        }
+        Person {
+            name: split_vec[0].to_string(),
+            age: parse_result.unwrap(),
+        }
     }
 }
 
@@ -52,6 +74,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_default() {
         // Test that the default person is 30 year old John
@@ -59,6 +82,7 @@ mod tests {
         assert_eq!(dp.name, "John");
         assert_eq!(dp.age, 30);
     }
+
     #[test]
     fn test_bad_convert() {
         // Test that John is returned when bad string is provided
@@ -66,6 +90,7 @@ mod tests {
         assert_eq!(p.name, "John");
         assert_eq!(p.age, 30);
     }
+
     #[test]
     fn test_good_convert() {
         // Test that "Mark,20" works
@@ -73,6 +98,7 @@ mod tests {
         assert_eq!(p.name, "Mark");
         assert_eq!(p.age, 20);
     }
+
     #[test]
     fn test_bad_age() {
         // Test that "Mark,twenty" will return the default person due to an error in parsing age
