@@ -11,7 +11,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -24,8 +23,27 @@ struct Person {
 // If everything goes well, then return a Result of a Person object
 
 impl FromStr for Person {
-    type Err = Box<dyn error::Error>;
+    type Err = String;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len() == 0 {
+            return Err("error size".to_string());
+        }
+        let split_vec: Vec<&str> = s.split(",").collect();
+        if split_vec.len() != 2 {
+            return Err("error size".to_string());
+        }
+        let x = split_vec[1].parse::<usize>();
+        if !x.is_ok() {
+            return Err("error size".to_string());
+        }
+        let name = split_vec[0];
+        if name.len() == 0 {
+            return Err("error size".to_string());
+        }
+        Ok(Person {
+            name: name.to_string(),
+            age: x.unwrap(),
+        })
     }
 }
 
@@ -42,6 +60,7 @@ mod tests {
     fn empty_input() {
         assert!("".parse::<Person>().is_err());
     }
+
     #[test]
     fn good_input() {
         let p = "John,32".parse::<Person>();
@@ -50,6 +69,7 @@ mod tests {
         assert_eq!(p.name, "John");
         assert_eq!(p.age, 32);
     }
+
     #[test]
     fn missing_age() {
         assert!("John,".parse::<Person>().is_err());
